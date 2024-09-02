@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="paint.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <title>Paint</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+</head>
+
+<body>
+    <main id="editor">
+        <h2 id="headingtext">Draw</h2>
+        <i id="sentencetext"></i><br>
+        <canvas id="paint_canvas" width="400" height="400"></canvas>
+        <span id="circularcursor" style="top:0; left:0; width:3px; height:2px;"></span>
+
+        <div class="tools">
+            <label for="width" id="brush_size">10</label><input type="range" id="width" value="10" onchange="updateCurSize(this.value)">
+            <input type="color" id="color" value="#FFFFFF">
+            <input type="checkbox" id="eraser" onclick="setErase()"><label for="eraser"><span class="material-symbols-outlined">
+                    ink_eraser
+                </span></label>
+        </div>
+
+        <button id="btntoinput">Done</button>
+        <button onclick="testImage()" type="button" id="test_imagebtn" class="invisible">Continue</button><br>
+        <button id="btndownload" class="secondary_button">Download</button>
+        <button onclick="clearArea();" class="secondary_button">Erase all</button>
+    </main>
+
+    <form method="post" enctype="multipart/form-data" id="imguploadform">
+        <label for="fileToUpload" class="opaque">Select image to upload:</label>
+        <input type="file" name="fileToUpload" id="fileToUpload" class="opaque"><br>
+    </form>
+
+    <div id="preview_window" class="invisible">
+        <h2>Preview</h2>
+        <div id="imagePreview"></div>
+        <a href="../">Create new</a>
+    </div>
+
+    <script src="main.js"></script>
+    <script src="download.js"></script>
+
+</body>
+
+</html>
