@@ -114,6 +114,11 @@ input {
 }
 
 @media screen and (max-width: 600px) {
+    html {
+        overflow: hidden;
+        overscroll-behavior: none;
+    }
+
     #paint_canvas {
         /* canvas size must be constant */
         height: 300px;

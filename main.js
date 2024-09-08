@@ -18,6 +18,7 @@ canvas.addEventListener("mousemove", custom_mouse_move);
 
 canvas.addEventListener("touchstart", custom_touch_start);
 canvas.addEventListener("touchmove", custom_touch_move);
+canvas.addEventListener("touchend", custom_touch_end);
 
 function elementScale(element) {
     return element.offsetWidth === 0 ? 0 : (element.width / element.offsetWidth);
@@ -76,10 +77,9 @@ function custom_touch_start(event) {
 }
 
 function custom_touch_move(event) {
-
     touch_pos_x = event.touches[0].clientX - canvas.offsetLeft;
     touch_pos_y = event.touches[0].clientY - canvas.offsetTop;
-
+    ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = brush_size;
     ctx.lineJoin = "round";
@@ -90,6 +90,11 @@ function custom_touch_move(event) {
 
     lastX = touch_pos_x;
     lastY = touch_pos_y;
+}
+
+function custom_touch_end(event) {
+    ctx.closePath();
+    ctx.stroke();
 }
 
 // tools
@@ -115,14 +120,24 @@ function updateCurSize(size) {
 }
 
 // resize canvas on small screens
-if (width < 990) {
-    document.getElementById("paint_canvas").height = 300;
-    document.getElementById("paint_canvas").width = 300;
-    document.body.style.overflow = "hidden";
+function resizeWindow() {
+    let wd = window.innerWidth
+    if (wd < 600) {
+        document.getElementById("paint_canvas").height = 300;
+        document.getElementById("paint_canvas").width = 300;
+        document.body.style.overflow = "hidden";
+    }
+    else {
+        document.getElementById("paint_canvas").height = 400;
+        document.getElementById("paint_canvas").width = 400;
+        document.body.style.overflow = "hidden";
+    }
 }
-
 function setup() {
+    console.log("setup")
     updateCurSize(10)
+    window.addEventListener("resize", resizeWindow);
+    resizeWindow()
 }
 
 setup()
