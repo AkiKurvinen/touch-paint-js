@@ -10,6 +10,9 @@ let mouseEvent = "empty"
 let lastX
 let lastY
 
+let body_margins = [16, 16]
+
+
 canvas.addEventListener("mouseenter", custom_mouse_enter);
 canvas.addEventListener("mousedown", custom_mouse_down);
 canvas.addEventListener("mouseleave", custom_mouse_leave);
@@ -47,8 +50,8 @@ function custom_mouse_enter(event) {
 }
 
 function custom_mouse_move(event) {
-    mouse_x = (event.pageX - canvas.offsetLeft);
-    mouse_y = (event.pageY - canvas.offsetTop);
+    mouse_x = (event.pageX - canvas.offsetLeft - body_margins[1]);
+    mouse_y = (event.pageY - canvas.offsetTop - body_margins[0]);
     fake_cursor.style.left = event.x - brush_size / 2 + "px";
     fake_cursor.style.top = event.y - brush_size / 2 + "px";
 
@@ -76,9 +79,11 @@ function custom_touch_start(event) {
     lastY = event.touches[0].clientY - canvas.offsetTop;
 }
 
+
 function custom_touch_move(event) {
-    touch_pos_x = event.touches[0].clientX - canvas.offsetLeft;
-    touch_pos_y = event.touches[0].clientY - canvas.offsetTop;
+
+    touch_pos_x = event.touches[0].clientX - canvas.offsetLeft - body_margins[1];
+    touch_pos_y = event.touches[0].clientY - canvas.offsetTop - body_margins[0];
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = brush_size;
