@@ -131,11 +131,13 @@ function resizeWindow() {
         document.getElementById("paint_canvas").height = 300;
         document.getElementById("paint_canvas").width = 300;
         document.body.style.overflow = "hidden";
+        body_margins = [16, 16]
     }
     else {
         document.getElementById("paint_canvas").height = 400;
         document.getElementById("paint_canvas").width = 400;
         document.body.style.overflow = "hidden";
+        body_margins = [0, 0]
     }
 }
 function setup() {
