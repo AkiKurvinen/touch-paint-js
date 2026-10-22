@@ -13,25 +13,40 @@ window.onload = function () {
 
     /* canvas to file input */
     var toinput = document.getElementById('btntoinput');
-    toinput.onclick = function () {
-        const context = canvas.getContext("2d")
+    toinput.onclick = async function () {
+        const previewCanvas = document.createElement("canvas");
+        previewCanvas.width = canvas.width;
+        previewCanvas.height = canvas.height;
+        previewCanvas.getContext("2d").drawImage(canvas, 0, 0);
+        const context = previewCanvas.getContext("2d")
         cropImageFromCanvas(context)
-        document.getElementById('test_imagebtn').classList.remove("invisible");
-        canvas.toBlob((blob) => {
-            drawnBlob = blob;
-            const file = new File([blob], 'myimage.png');
-            const dT = new DataTransfer();
-            dT.items.add(file);
-            document.querySelector("#fileToUpload").files = dT.files;
+        drawnBlob = await new Promise((resolve) => {
+            previewCanvas.toBlob(resolve);
         });
+        if (!drawnBlob) {
+            throw new Error("Could not create an image from the canvas");
+        }
+        const file = new File([drawnBlob], 'myimage.png');
+        const dT = new DataTransfer();
+        dT.items.add(file);
+        document.querySelector("#fileToUpload").files = dT.files;
+
+        previewImage();
+        document.getElementById("editor").classList.add("invisible");
+        document.getElementById("imguploadform").classList.add("invisible");
+        document.getElementById("preview_window").classList.remove("invisible");
     }
 }
 
 function previewImage() {
     const file = document.querySelector("#fileToUpload").files[0];
     const elem = document.querySelector("#imagePreview");
-    elem.appendChild(new Image())
-        .src = URL.createObjectURL(file);
+    elem.replaceChildren();
+    const image = new Image();
+    const imageUrl = URL.createObjectURL(file);
+    image.onload = () => URL.revokeObjectURL(imageUrl);
+    image.src = imageUrl;
+    elem.appendChild(image);
 }
 
 // the editor canvas is removed in the preview, so download the saved drawing
@@ -46,11 +61,20 @@ function downloadPreview() {
     URL.revokeObjectURL(lnk.href);
 }
 
-function testImage() {
-    previewImage()
-    document.getElementById("imguploadform").innerHTML = ""
-    document.getElementById("editor").innerHTML = ""
-    document.getElementById("preview_window").classList.remove("invisible")
+function backToEdit() {
+    // the drawing may change, so it has to be uploaded again
+    if (document.getElementById("upload_button")) {
+        setUploadDone(false);
+        document.getElementById("upload_status").innerText = "";
+    }
+    document.getElementById("preview_window").classList.add("invisible");
+    document.getElementById("imguploadform").classList.remove("invisible");
+    document.getElementById("editor").classList.remove("invisible");
+}
+
+function continueFromPreview() {
+    document.getElementById("preview_options").classList.add("invisible");
+    document.getElementById("preview_next").classList.remove("invisible");
 }
 
 function cropImageFromCanvas(ctx) {

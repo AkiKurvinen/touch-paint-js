@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="paint.css">
+    <title>Test page</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+</head>
+<body>
+    <main>
+        <h1>Test page</h1>
+        <p>Lobby: <span id="lobby"></span></p>
+        <p>Username: <span id="username"></span></p>
+        <p id="status"></p>
+        <img id="image" alt="" hidden>
+        <p><a href="display.html" id="back_link">Back</a></p>
+    </main>
+
+    <script>
+        const API_URL = "../backend/api.php";
+
+        const query = new URLSearchParams(window.location.search);
+        const lobby = query.get("lobby") || "";
+        const username = query.get("username") || "";
+
+        document.getElementById("lobby").textContent = lobby || "-";
+        document.getElementById("username").textContent = username || "-";
+        document.getElementById("back_link").href =
+            "display.html?" + new URLSearchParams({ lobby, username });
+
+        const status = document.getElementById("status");
+        const image = document.getElementById("image");
+
+        if (!username) {
+            status.textContent = "No username given";
+        } else {
+            const params = new URLSearchParams({ img: username, t: Date.now() });
+            if (lobby) {
+                params.set("lobby", lobby);
+            }
+            image.alt = username;
+            image.style.maxWidth = "100%";
+            image.style.backgroundImage = "url('chess-pattern.png')";
+            image.style.borderRadius = "4px";
+            image.onload = () => {
+                status.textContent = "";
+                image.hidden = false;
+            };
+            image.onerror = () => { status.textContent = "Image not found"; };
+            status.textContent = "Loading...";
+            image.src = API_URL + "?" + params.toString();
+        }
+    </script>
+</body>
+</html>

@@ -155,16 +155,35 @@ function setupBackendUpload() {
     const panel = document.createElement("form");
     panel.id = "backend_upload";
     panel.innerHTML = `
-        <label for="lobby">Lobby</label>
-        <input type="text" id="lobby" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()">
-        <label for="username">Username</label>
-        <input type="text" id="username" autocomplete="off" maxlength="32" pattern="[A-Za-z0-9_\\-]+" required><br>
-        <button type="submit">Upload</button>
-        <p id="upload_status"></p>
-        <a id="display_link" class="invisible">View uploaded image</a>`;
-    const preview = document.getElementById("preview_window");
-    preview.insertBefore(panel, preview.querySelector("a"));
+    <p>Upload your drawing to...</p>
+        <div class="field">
+            <label for="lobby">Lobby</label>
+            <input type="text" id="lobby" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()">
+        </div>
+        <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" autocomplete="off" maxlength="32" pattern="[A-Za-z0-9_\\-]+" required>
+        </div>
+        <button type="submit" id="upload_button">Upload</button>
+        <a id="display_link" class="invisible">View image</a>
+        <p id="upload_status"></p>`;
+    const nextStep = document.getElementById("preview_next");
+    nextStep.insertBefore(panel, nextStep.firstChild);
+
+    const params = new URLSearchParams(window.location.search);
+    panel.querySelector("#lobby").value = (params.get("lobby") || "").toLowerCase().trim();
+    panel.querySelector("#username").value = (params.get("username") || "").trim();
     panel.addEventListener("submit", uploadToBackend);
+}
+
+// after a successful upload the Upload button is replaced by the link to the image
+function setUploadDone(done, result) {
+    const link = document.getElementById("display_link");
+    document.getElementById("upload_button").classList.toggle("invisible", done);
+    link.classList.toggle("invisible", !done);
+    if (done) {
+        link.href = "display.html?" + new URLSearchParams({ lobby: result.lobby, username: result.username });
+    }
 }
 
 async function uploadToBackend(event) {
@@ -183,13 +202,7 @@ async function uploadToBackend(event) {
         const response = await fetch(BACKEND_URL, { method: "POST", body: data });
         const result = await response.json();
         status.innerText = result.ok ? "Uploaded!" : "Error: " + result.error;
-        const link = document.getElementById("display_link");
-        if (result.ok) {
-            link.href = "display.html?" + new URLSearchParams({ lobby: result.lobby, username: result.username });
-            link.classList.remove("invisible");
-        } else {
-            link.classList.add("invisible");
-        }
+        setUploadDone(result.ok, result);
     } catch (error) {
         status.innerText = "Error: could not reach backend";
     }

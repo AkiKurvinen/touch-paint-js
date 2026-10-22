@@ -7,35 +7,148 @@
     <link rel="stylesheet" type="text/css" href="paint.css">
     <title>Display</title>
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <style>
+        /* allow the page to scroll when there are many images */
+        html {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            overflow: visible;
+        }
+
+        main {
+            overflow: visible;
+        }
+
+        #display_image {
+            padding-bottom: 2em;
+        }
+
+        details summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        /* chevron on the right, rotates when open */
+        details summary::after {
+            content: "";
+            width: 0.5em;
+            height: 0.5em;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg);
+            transition: transform 0.2s;
+        }
+
+        details[open] summary::after {
+            transform: rotate(-135deg);
+        }
+    </style>
 </head>
 
 <body>
     <main>
-        <h2>Display</h2>
-        <form id="displayform">
-            <label for="lobby">Lobby</label>
-            <input type="text" id="lobby" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()">
-            <label for="username">Username</label>
-            <input type="text" id="username" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()"><br>
-            <button type="submit">Show</button>
-        </form>
+
+        <details id="display_details" name="accordion" open>
+            <summary>Display image</summary>
+            <form id="displayform">
+                <div class="field">
+                    <label for="lobby">Lobby</label>
+                    <input type="text" id="lobby" autocomplete="off"
+                        required
+                        oninput="this.value=this.value.toLowerCase().trim()">
+                </div>
+                <div class="field">
+                    <label for="username">Username (* for all)</label>
+                    <input type="text" id="username" autocomplete="off"
+                    required
+                        oninput="this.value=this.value.toLowerCase().trim()">
+                </div>
+                <button type="submit">Show</button>
+            </form>
+        </details>
         <p id="display_status"></p>
         <div id="display_image"></div>
+        <p><a id="continue_link" href="nextpage.html" hidden>Continue</a></p>
     </main>
 
     <script>
         // API of the backend (see ../backend/README.md)
         const API_URL = "../backend/api.php";
+        const LOBBY_URL = "../backend/lobby.php";
 
         const form = document.getElementById("displayform");
         const status = document.getElementById("display_status");
         const container = document.getElementById("display_image");
+        const details = document.getElementById("display_details");
+        const continueLink = document.getElementById("continue_link");
 
+        // username "*" shows every image of the lobby
+        async function showAll(lobby) {
+            status.innerText = "Loading...";
+            try {
+                const response = await fetch(LOBBY_URL + "?" + new URLSearchParams({ lobby }));
+                const result = await response.json();
+                if (!result.ok) {
+                    status.innerText = "Error: " + result.error;
+                    details.open = true;
+                    return;
+                }
+                if (result.users.length === 0) {
+                    status.innerText = "No images in this lobby";
+                    details.open = true;
+                    return;
+                }
+                status.innerText = "";
+                container.style.display = "flex";
+                container.style.flexWrap = "wrap";
+                container.style.gap = "1em";
+                for (const user of result.users) {
+                    const figure = document.createElement("figure");
+                    figure.style.margin = "0";
+                    const img = new Image();
+                    img.src = user.image;
+                    img.alt = user.username;
+                    img.style.maxWidth = "150px";
+                    img.style.display = "block";
+                    img.style.backgroundImage = "url('chess-pattern.png')";
+                    img.style.borderRadius = "4px";
+                    const caption = document.createElement("figcaption");
+                    caption.innerText = user.username;
+                    figure.append(img, caption);
+                    container.appendChild(figure);
+                }
+            } catch (error) {
+                status.innerText = "Error: could not reach backend";
+                details.open = true;
+            }
+        }
+
+        // returns false when the input is invalid
         function showImage(lobby, username) {
             container.innerHTML = "";
+            container.style.display = "";
+            continueLink.hidden = true;
             if (!username) {
                 status.innerText = "Enter a username";
-                return;
+                return false;
+            }
+            if (username === "*") {
+                if (!lobby) {
+                    status.innerText = "Enter a lobby to display all users";
+                    return false;
+                }
+                showAll(lobby);
+                return true;
             }
             const params = new URLSearchParams({ img: username });
             if (lobby) {
@@ -44,23 +157,35 @@
             const img = new Image();
             img.alt = username;
             img.style.maxWidth = "100%";
-            img.onload = () => { status.innerText = ""; };
+            img.style.backgroundImage = "url('chess-pattern.png')";
+            img.style.borderRadius = "4px";
+            img.onload = () => {
+                status.innerText = "";
+                if (lobby) {
+                    continueLink.href = "testpage.html?" + new URLSearchParams({ lobby, username });
+                    continueLink.hidden = false;
+                }
+            };
             img.onerror = () => {
                 img.remove();
                 status.innerText = "Image not found";
+                details.open = true;
             };
             // timestamp avoids showing a cached older upload
             params.set("t", Date.now());
             img.src = API_URL + "?" + params.toString();
             status.innerText = "Loading...";
             container.appendChild(img);
+            return true;
         }
 
         const query = new URLSearchParams(window.location.search);
         document.getElementById("lobby").value = query.get("lobby") || "";
         document.getElementById("username").value = query.get("username") || "";
         if (query.get("username")) {
-            showImage(query.get("lobby") || "", query.get("username"));
+            if (showImage(query.get("lobby") || "", query.get("username"))) {
+                document.getElementById("display_details").open = false;
+            }
         }
 
         form.addEventListener("submit", (event) => {
@@ -70,7 +195,9 @@
             const url = new URL(window.location.href);
             url.search = new URLSearchParams({ lobby, username }).toString();
             history.replaceState(null, "", url);
-            showImage(lobby, username);
+            if (showImage(lobby, username)) {
+                document.getElementById("display_details").open = false;
+            }
         });
     </script>
 </body>

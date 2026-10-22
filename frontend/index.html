@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="paint.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <title>Paint</title>
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
 </head>
@@ -18,15 +19,17 @@
         <span id="circularcursor" style="top:0; left:0; width:3px; height:2px;"></span>
 
         <div class="tools">
-            <label for="width" id="brush_size">10</label><input type="range" id="width" value="10" onchange="updateCurSize(this.value)">
+            <label for="width" id="brush_size">10</label><input type="range" id="width" value="10"
+                onchange="updateCurSize(this.value)">
             <input type="color" id="color" value="#FFFFFF">
-            <input type="checkbox" id="eraser" onclick="setErase()"><label for="eraser"><span class="material-symbols-outlined">
+            <input type="checkbox" id="eraser" onclick="setErase()"><label for="eraser"><span
+                    class="material-symbols-outlined">
                     ink_eraser
                 </span></label>
         </div>
 
         <button id="btntoinput">Done</button>
-        <button onclick="testImage()" type="button" id="test_imagebtn" class="invisible">Continue</button><br>
+        <br>
         <button id="btndownload" class="secondary_button">Download</button>
         <button onclick="clearArea();" class="secondary_button">Erase all</button>
     </main>
@@ -39,10 +42,16 @@
     <div id="preview_window" class="invisible">
         <h2>Preview</h2>
         <div id="imagePreview"></div>
-        <button id="btnpreviewdownload" type="button" onclick="downloadPreview()">Download</button><br><br>
-        <a href="https://akikurvinen.github.io/touch-paint-js/">Create new</a>
+        <div id="preview_options">
+            <button id="btnbacktoedit" class="secondary_button" type="button" onclick="backToEdit()">Back to edit</button>
+            <button id="btncontinuepreview" type="button" onclick="continueFromPreview()">Continue</button>
+        </div>
+        <div id="preview_next" class="invisible">
+            <button id="btnpreviewdownload" class="secondary_button" type="button"
+                onclick="downloadPreview()">Download</button><br><br>
+            <a href="index.html" class="secondary_button">Create new</a>
+        </div>
     </div>
-
     <script src="main.js"></script>
     <script src="download.js"></script>
 

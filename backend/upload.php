@@ -38,6 +38,9 @@ if ($info === false || $info['mime'] !== 'image/png') {
     json_response(415, ['ok' => false, 'error' => 'Only PNG images are allowed']);
 }
 
+clearstatcache();
+clean_old_lobbies("img/custom");
+
 $target_dir = "img/custom/$lobby/";
 if (!file_exists($target_dir) && !mkdir($target_dir, 0777, true)) {
     json_response(500, ['ok' => false, 'error' => 'Could not create lobby']);
