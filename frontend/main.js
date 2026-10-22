@@ -1,6 +1,7 @@
 // Set to true to enable uploading drawings to the backend (see ../backend/README.md)
 const USE_BACKEND = true;
 const BACKEND_URL = "../backend/upload.php";
+let default_image_name = "myimage";
 
 const canvas = document.getElementById("paint_canvas");
 const ctx = canvas.getContext("2d");
@@ -174,6 +175,7 @@ function setupBackendUpload() {
     panel.querySelector("#lobby").value = (params.get("lobby") || "").toLowerCase().trim();
     panel.querySelector("#username").value = (params.get("username") || "").trim();
     panel.addEventListener("submit", uploadToBackend);
+    default_image_name = `${panel.querySelector("#lobby").value}_${panel.querySelector("#username").value}`
 }
 
 // after a successful upload the Upload button is replaced by the link to the image
@@ -186,7 +188,7 @@ function setUploadDone(done, result) {
     }
 }
 
-async function uploadToBackend(event) {
+async function uploadToBackend(event, imageName = default_image_name) {
     event.preventDefault();
     const status = document.getElementById("upload_status");
     if (!drawnBlob) {
@@ -196,7 +198,7 @@ async function uploadToBackend(event) {
     const data = new FormData();
     data.append("lobby", document.getElementById("lobby").value);
     data.append("username", document.getElementById("username").value);
-    data.append("fileToUpload", drawnBlob, "myimage.png");
+    data.append("fileToUpload", drawnBlob, `${imageName}.png`);
     status.innerText = "Uploading...";
     try {
         const response = await fetch(BACKEND_URL, { method: "POST", body: data });

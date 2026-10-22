@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+</head>
+<body>
+    <form action="../frontend/" method="get">
+        <p>
+            <label>Lobby<br>
+                <input type="text" name="lobby" autocomplete="off" required
+                    oninput="this.value=this.value.toLowerCase().trim()">
+            </label>
+        </p>
+        <p>
+            <label>Username<br>
+                <input type="text" name="username" autocomplete="off" maxlength="32"
+                    pattern="[A-Za-z0-9_\-]+" required>
+            </label>
+        </p>
+        <button type="submit">Start</button>
+    </form>
+</body>
+</html>

@@ -78,7 +78,7 @@
         </details>
         <p id="display_status"></p>
         <div id="display_image"></div>
-        <p><a id="continue_link" href="nextpage.html" hidden>Continue</a></p>
+        <p><a id="continue_link" href="../samplepage/testpage.html" hidden>Continue</a></p>
     </main>
 
     <script>
@@ -162,7 +162,7 @@
             img.onload = () => {
                 status.innerText = "";
                 if (lobby) {
-                    continueLink.href = "testpage.html?" + new URLSearchParams({ lobby, username });
+                    continueLink.href = "../samplepage/testpage.html?" + new URLSearchParams({ lobby, username });
                     continueLink.hidden = false;
                 }
             };

@@ -8,25 +8,13 @@ window.onload = function () {
 
     // Event handler for download
     dwn.onclick = function () {
-        download(canvas, 'myimage.png');
+        download(canvas);
     }
 
     /* canvas to file input */
     var toinput = document.getElementById('btntoinput');
     toinput.onclick = async function () {
-        const previewCanvas = document.createElement("canvas");
-        previewCanvas.width = canvas.width;
-        previewCanvas.height = canvas.height;
-        previewCanvas.getContext("2d").drawImage(canvas, 0, 0);
-        const context = previewCanvas.getContext("2d")
-        cropImageFromCanvas(context)
-        drawnBlob = await new Promise((resolve) => {
-            previewCanvas.toBlob(resolve);
-        });
-        if (!drawnBlob) {
-            throw new Error("Could not create an image from the canvas");
-        }
-        const file = new File([drawnBlob], 'myimage.png');
+        const file = await createUploadFile();
         const dT = new DataTransfer();
         dT.items.add(file);
         document.querySelector("#fileToUpload").files = dT.files;
@@ -36,6 +24,22 @@ window.onload = function () {
         document.getElementById("imguploadform").classList.add("invisible");
         document.getElementById("preview_window").classList.remove("invisible");
     }
+}
+
+async function createUploadFile(imageName = default_image_name) {
+    const canvas = document.getElementById('paint_canvas');
+    const previewCanvas = document.createElement("canvas");
+    previewCanvas.width = canvas.width;
+    previewCanvas.height = canvas.height;
+    previewCanvas.getContext("2d").drawImage(canvas, 0, 0);
+    cropImageFromCanvas(previewCanvas.getContext("2d"));
+    drawnBlob = await new Promise((resolve) => {
+        previewCanvas.toBlob(resolve);
+    });
+    if (!drawnBlob) {
+        throw new Error("Could not create an image from the canvas");
+    }
+    return new File([drawnBlob], `${imageName}.png`);
 }
 
 function previewImage() {
@@ -50,12 +54,12 @@ function previewImage() {
 }
 
 // the editor canvas is removed in the preview, so download the saved drawing
-function downloadPreview() {
+function downloadPreview(imageName = default_image_name) {
     if (!drawnBlob) {
         return;
     }
     const lnk = document.createElement('a');
-    lnk.download = 'myimage.png';
+    lnk.download = `${imageName}.png`;
     lnk.href = URL.createObjectURL(drawnBlob);
     lnk.click();
     URL.revokeObjectURL(lnk.href);
@@ -131,7 +135,7 @@ function drawImageScaled(img, ctx) {
 // Source from:  http://stackoverflow.com/questions/18480474/how-to-save-an-image-from-canvas
 
 /* Canvas Donwload */
-function download(canvas, filename) {
+function download(canvas, imageName = default_image_name) {
 
     const cropImage = false;
 
@@ -143,7 +147,7 @@ function download(canvas, filename) {
     var lnk = document.createElement('a'), e;
 
     /// the key here is to set the download attribute of the a tag
-    lnk.download = filename;
+    lnk.download = `${imageName}.png`;
 
     /// convert canvas content to data-uri for link. When download
     /// attribute is set the content pointed to by link will be

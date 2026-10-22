@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="paint.css">
     <title>Test page</title>
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
 </head>
@@ -14,7 +13,7 @@
         <p>Username: <span id="username"></span></p>
         <p id="status"></p>
         <img id="image" alt="" hidden>
-        <p><a href="display.html" id="back_link">Back</a></p>
+        <p><a href="index.html" id="back_link">Return</a></p>
     </main>
 
     <script>
@@ -27,7 +26,7 @@
         document.getElementById("lobby").textContent = lobby || "-";
         document.getElementById("username").textContent = username || "-";
         document.getElementById("back_link").href =
-            "display.html?" + new URLSearchParams({ lobby, username });
+            "../frontend/display.html?" + new URLSearchParams({ lobby, username });
 
         const status = document.getElementById("status");
         const image = document.getElementById("image");
@@ -41,7 +40,7 @@
             }
             image.alt = username;
             image.style.maxWidth = "100%";
-            image.style.backgroundImage = "url('chess-pattern.png')";
+            image.style.backgroundImage = "url('../frontend/chess-pattern.png')";
             image.style.borderRadius = "4px";
             image.onload = () => {
                 status.textContent = "";
