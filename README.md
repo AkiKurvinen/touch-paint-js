@@ -15,7 +15,7 @@
 ## Dev
 ```
 php -S localhost:8000 -t . 
-http://localhost:8000/samplepage/
+http://localhost:8000/api/
 ```
 
 ## Backend - API

@@ -158,8 +158,8 @@ function setupBackendUpload() {
     panel.innerHTML = `
     <p>Upload your drawing to...</p>
         <div class="field">
-            <label for="lobby">Lobby</label>
-            <input type="text" id="lobby" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()">
+            <label for="lobby">Lobby (readonly)</label>
+            <input type="text" id="lobby" readonly autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()">
         </div>
         <div class="field">
             <label for="username">Username</label>

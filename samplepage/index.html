@@ -8,12 +8,7 @@
 </head>
 <body>
     <form action="../frontend/" method="get">
-        <p>
-            <label>Lobby<br>
-                <input type="text" name="lobby" autocomplete="off" required
-                    oninput="this.value=this.value.toLowerCase().trim()">
-            </label>
-        </p>
+        <input type="hidden" name="lobby" value="test">
         <p>
             <label>Username<br>
                 <input type="text" name="username" autocomplete="off" maxlength="32"
@@ -22,5 +17,6 @@
         </p>
         <button type="submit">Start</button>
     </form>
+
 </body>
 </html>

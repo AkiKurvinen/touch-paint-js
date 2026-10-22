@@ -5,6 +5,23 @@ header("Access-Control-Allow-Origin: *");
 $img = $_GET['img'] ?? '';
 $lobby = strtolower($_GET['lobby'] ?? '');
 
+// GET api.php?lobby=name&start=true creates the lobby folder and returns an example starting url
+if ($img === '' && $lobby !== '' && ($_GET['start'] ?? '') === 'true') {
+    header("Content-Type: application/json");
+    if (!ctype_alnum($lobby)) {
+        http_response_code(400);
+        die(json_encode(['ok' => false, 'error' => 'Invalid lobby']));
+    }
+    $dir = "img/custom/$lobby";
+    if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        http_response_code(500);
+        die(json_encode(['ok' => false, 'error' => 'Could not create lobby']));
+    }
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $root = preg_replace('#/backend/[^/]*$#', '', $_SERVER['SCRIPT_NAME']);
+    $url = "$scheme://{$_SERVER['HTTP_HOST']}$root/backend/api.php?" . http_build_query(['lobby' => $lobby]);
+    die(json_encode(['ok' => true, 'lobby' => $lobby, 'url' => $url]));
+}
 if ($img === '') {
     if ($lobby !== '') {
         echo $lobby;
