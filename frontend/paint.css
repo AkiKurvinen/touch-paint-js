@@ -22,6 +22,8 @@ main {
     height: 400px;
     width: 400px;
     cursor: none;
+    /* drawing with touch must not scroll the page */
+    touch-action: none;
 }
 
 #circularcursor {
@@ -115,11 +117,6 @@ input {
 }
 
 @media screen and (max-width: 600px) {
-    html {
-        overflow: hidden;
-        overscroll-behavior: none;
-    }
-
     #paint_canvas {
         /* canvas size must be constant */
         height: 300px;

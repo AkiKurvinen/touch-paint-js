@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="paint.css">
+    <title>Display</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+</head>
+
+<body>
+    <main>
+        <h2>Display</h2>
+        <form id="displayform">
+            <label for="lobby">Lobby</label>
+            <input type="text" id="lobby" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()">
+            <label for="username">Username</label>
+            <input type="text" id="username" autocomplete="off" oninput="this.value=this.value.toLowerCase().trim()"><br>
+            <button type="submit">Show</button>
+        </form>
+        <p id="display_status"></p>
+        <div id="display_image"></div>
+    </main>
+
+    <script>
+        // API of the backend (see ../backend/README.md)
+        const API_URL = "../backend/api.php";
+
+        const form = document.getElementById("displayform");
+        const status = document.getElementById("display_status");
+        const container = document.getElementById("display_image");
+
+        function showImage(lobby, username) {
+            container.innerHTML = "";
+            if (!username) {
+                status.innerText = "Enter a username";
+                return;
+            }
+            const params = new URLSearchParams({ img: username });
+            if (lobby) {
+                params.set("lobby", lobby);
+            }
+            const img = new Image();
+            img.alt = username;
+            img.style.maxWidth = "100%";
+            img.onload = () => { status.innerText = ""; };
+            img.onerror = () => {
+                img.remove();
+                status.innerText = "Image not found";
+            };
+            // timestamp avoids showing a cached older upload
+            params.set("t", Date.now());
+            img.src = API_URL + "?" + params.toString();
+            status.innerText = "Loading...";
+            container.appendChild(img);
+        }
+
+        const query = new URLSearchParams(window.location.search);
+        document.getElementById("lobby").value = query.get("lobby") || "";
+        document.getElementById("username").value = query.get("username") || "";
+        if (query.get("username")) {
+            showImage(query.get("lobby") || "", query.get("username"));
+        }
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const lobby = document.getElementById("lobby").value;
+            const username = document.getElementById("username").value;
+            const url = new URL(window.location.href);
+            url.search = new URLSearchParams({ lobby, username }).toString();
+            history.replaceState(null, "", url);
+            showImage(lobby, username);
+        });
+    </script>
+</body>
+
+</html>

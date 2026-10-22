@@ -1,3 +1,6 @@
+// latest finished drawing, used by the optional backend upload
+let drawnBlob = null;
+
 // Initializing
 window.onload = function () {
     var dwn = document.getElementById('btndownload');
@@ -15,6 +18,7 @@ window.onload = function () {
         cropImageFromCanvas(context)
         document.getElementById('test_imagebtn').classList.remove("invisible");
         canvas.toBlob((blob) => {
+            drawnBlob = blob;
             const file = new File([blob], 'myimage.png');
             const dT = new DataTransfer();
             dT.items.add(file);
@@ -28,6 +32,18 @@ function previewImage() {
     const elem = document.querySelector("#imagePreview");
     elem.appendChild(new Image())
         .src = URL.createObjectURL(file);
+}
+
+// the editor canvas is removed in the preview, so download the saved drawing
+function downloadPreview() {
+    if (!drawnBlob) {
+        return;
+    }
+    const lnk = document.createElement('a');
+    lnk.download = 'myimage.png';
+    lnk.href = URL.createObjectURL(drawnBlob);
+    lnk.click();
+    URL.revokeObjectURL(lnk.href);
 }
 
 function testImage() {

@@ -10,3 +10,8 @@
 - Draw something on canvas
 - Press Done to crop image and add it as form input file
 - Press Continue to send form and preview image
+
+
+## Dev
+php -S localhost:8000 -t . 
+http://localhost:8000/frontend/
